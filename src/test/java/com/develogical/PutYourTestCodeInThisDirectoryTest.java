@@ -30,4 +30,18 @@ public class PutYourTestCodeInThisDirectoryTest {
         Forecast sameForecast = client.forecastFor(Region.LONDON, Day.MONDAY);
         verify(delegate, times(1)).forecastFor(ArgumentMatchers.<Region>any(), ArgumentMatchers.<Day>any());
     }
+
+    @Test
+    public void testCacheWithDifferentQueries() throws Exception {
+        ForecasterClient delegate = mock(ForecasterClient.class);
+        when(delegate.forecastFor(Region.LONDON, Day.MONDAY)).thenReturn(new Forecast("cloudy", 25));
+        when(delegate.forecastFor(Region.BIRMINGHAM, Day.MONDAY)).thenReturn(new Forecast("sunny", 10));
+        CachingForecastClient client = new CachingForecastClient(delegate);
+        Forecast newForecast = client.forecastFor(Region.LONDON, Day.MONDAY);
+        Forecast secondForecast = client.forecastFor(Region.BIRMINGHAM, Day.MONDAY);
+        Forecast thirdForecast = client.forecastFor(Region.BIRMINGHAM, Day.MONDAY);
+        verify(delegate, times(2)).forecastFor(ArgumentMatchers.<Region>any(), ArgumentMatchers.<Day>any());
+        assertThat(thirdForecast.summary(), equalTo("sunny"));
+        assertThat(thirdForecast.temperature(), equalTo(10));
+    }
 }
