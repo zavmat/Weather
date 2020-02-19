@@ -4,6 +4,7 @@ import com.weather.Forecast;
 import com.weather.Region;
 import com.weather.Day;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -26,6 +27,7 @@ public class PutYourTestCodeInThisDirectoryTest {
         when(delegate.forecastFor(Region.LONDON, Day.MONDAY)).thenReturn(new Forecast("cloudy", 25));
         CachingForecastClient client = new CachingForecastClient(delegate);
         Forecast newForecast =  client.forecastFor(Region.LONDON, Day.MONDAY);
-        verifyZeroInteractions(delegate);
+        Forecast sameForecast =  client.forecastFor(Region.LONDON, Day.MONDAY);
+        verify(delegate, times(1)).forecastFor(ArgumentMatchers.<Region>any(),ArgumentMatchers.<Day>any());
     }
 }

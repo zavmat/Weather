@@ -18,3 +18,4 @@ public class CachingForecastClient {
         return cached;
     }
 }
+
